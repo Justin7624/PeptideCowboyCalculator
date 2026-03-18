@@ -4,85 +4,141 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Peptide Cowboy Calculator</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Rye&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0b0b0b;
-    color: #fff;
+    margin:0;
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at top, #1a1a1a, #000);
+    color:white;
 }
 
 .header {
-    text-align: center;
-    padding: 20px;
-    background: linear-gradient(90deg, #0b0b0b, #1c1c1c);
+    text-align:center;
+    padding:15px;
+    border-bottom:1px solid #333;
 }
 
 .header img {
-    max-width: 200px;
+    max-width:180px;
 }
 
 .title {
-    font-size: 36px;
-    font-weight: bold;
-    margin-top: 10px;
-    color: #ffffff;
+    font-family:'Rye', cursive;
+    font-size:34px;
+    color:#d4af37;
+    margin-top:10px;
 }
 
 .container {
-    display: flex;
-    gap: 20px;
-    padding: 20px;
-    flex-wrap: wrap;
+    display:flex;
+    gap:15px;
+    padding:15px;
+    flex-wrap:wrap;
 }
 
 .card {
-    background: #1a1a1a;
-    border-radius: 12px;
-    padding: 20px;
-    flex: 1;
-    min-width: 300px;
+    flex:1;
+    min-width:300px;
+    background: linear-gradient(145deg, #1c1c1c, #111);
+    border-radius:12px;
+    padding:18px;
+    box-shadow:0 0 20px rgba(212,175,55,0.15);
 }
 
 h2 {
-    margin-top: 0;
-    color: #d4af37;
+    margin-top:0;
+    color:#d4af37;
+    font-weight:700;
 }
 
 label {
-    display: block;
-    margin-top: 10px;
-    font-size: 14px;
+    font-size:13px;
+    margin-top:10px;
+    display:block;
 }
 
 input, select {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border-radius: 6px;
-    border: none;
-    background: #2a2a2a;
-    color: white;
+    width:100%;
+    padding:10px;
+    margin-top:5px;
+    border-radius:6px;
+    border:1px solid #333;
+    background:#111;
+    color:white;
+}
+
+.presets button {
+    margin:5px;
+    padding:8px 12px;
+    border-radius:6px;
+    border:none;
+    background:#222;
+    color:#d4af37;
+    cursor:pointer;
+}
+
+.presets button:hover {
+    background:#d4af37;
+    color:black;
 }
 
 .result {
-    font-size: 22px;
-    margin-top: 20px;
-    font-weight: bold;
+    font-size:22px;
+    margin-top:10px;
+    font-weight:700;
+}
+
+.subbox {
+    margin-top:10px;
+    padding:10px;
+    background:#111;
+    border-radius:8px;
+}
+
+.scale {
+    margin-top:15px;
+    height:50px;
+    background:#111;
+    border-radius:10px;
+    position:relative;
+}
+
+.tick {
+    position:absolute;
+    bottom:0;
+    width:1px;
+    height:10px;
+    background:#999;
+}
+
+.tick.major {
+    height:20px;
+    background:#d4af37;
+}
+
+.indicator {
+    position:absolute;
+    top:0;
+    width:4px;
+    height:100%;
+    background:#d4af37;
 }
 
 .footer {
-    text-align: center;
-    padding: 10px;
-    font-size: 12px;
-    background: #111;
+    text-align:center;
+    padding:10px;
+    font-size:12px;
+    color:#aaa;
 }
 </style>
 </head>
 <body>
 
 <div class="header">
-    <img src="PeptideCowboy.jpg" alt="logo">
+    <img src="PeptideCowboy.jpg">
     <div class="title">Peptide Cowboy Calculator</div>
 </div>
 
@@ -91,50 +147,103 @@ input, select {
 <div class="card">
 <h2>Vial & Dose Settings</h2>
 
-<label>Content per vial (mg)</label>
-<input type="number" id="vial" value="5">
+<label>Content per vial</label>
+<input id="vial" type="number" value="5">
 
-<label>Total diluent added (mL)</label>
-<input type="number" id="diluent" value="1">
+<label>Total diluent (mL)</label>
+<input id="diluent" type="number" value="1">
 
-<label>Desired dose (mg)</label>
-<input type="number" id="dose" value="0.5">
+<label>Desired dose</label>
+<input id="dose" type="number" value="0.5">
 
-<label>Insulin syringe scale</label>
+<label>Unit</label>
+<select id="unit">
+<option value="mg">mg</option>
+<option value="mcg">mcg</option>
+</select>
+
+<label>Syringe scale</label>
 <select id="scale">
 <option value="100">100 units</option>
 <option value="50">50 units</option>
 </select>
 
+<div class="presets">
+<button onclick="preset(1)">1 MG</button>
+<button onclick="preset(2)">2 MG</button>
+<button onclick="preset(5)">5 MG</button>
+<button onclick="preset(10)">10 MG</button>
+</div>
+
 </div>
 
 <div class="card">
-<h2>Result</h2>
-<div class="result" id="output">—</div>
-</div>
+<h2>Pull This Amount</h2>
+<div class="result" id="mainResult">—</div>
+
+<div class="subbox" id="unitsBox"></div>
+<div class="subbox" id="perUnitBox"></div>
+
+<div class="scale" id="scaleBar"></div>
 
 </div>
 
-<div class="footer">Research use only. Not medical advice.</div>
+</div>
+
+<div class="footer">Research use only — not medical advice.</div>
 
 <script>
-function calculate() {
-    const vial = parseFloat(document.getElementById('vial').value);
-    const diluent = parseFloat(document.getElementById('diluent').value);
-    const dose = parseFloat(document.getElementById('dose').value);
-    const scale = parseFloat(document.getElementById('scale').value);
-
-    if (!vial || !diluent || !dose) return;
-
-    const mgPerMl = vial / diluent;
-    const mlNeeded = dose / mgPerMl;
-    const units = mlNeeded * scale;
-
-    document.getElementById('output').innerText = `Draw to ${units.toFixed(2)} units`;
+function preset(val){
+    document.getElementById('dose').value = val;
+    calculate();
 }
 
-['vial','diluent','dose','scale'].forEach(id => {
-    document.getElementById(id).addEventListener('input', calculate);
+function buildScale(max){
+    const bar = document.getElementById('scaleBar');
+    bar.innerHTML = '';
+    for(let i=0;i<=max;i++){
+        const tick = document.createElement('div');
+        tick.className = 'tick ' + (i%10===0?'major':'');
+        tick.style.left = (i/max*100)+'%';
+        bar.appendChild(tick);
+    }
+}
+
+function calculate(){
+    let vial = parseFloat(vialInput.value);
+    let diluent = parseFloat(diluentInput.value);
+    let dose = parseFloat(doseInput.value);
+    let unit = unitInput.value;
+    let scale = parseFloat(scaleInput.value);
+
+    if(unit==='mcg') dose/=1000;
+
+    let mgPerMl = vial/diluent;
+    let ml = dose/mgPerMl;
+    let units = ml*scale;
+
+    mainResult.innerText = `Draw to ${units.toFixed(2)} units`;
+    unitsBox.innerText = `${units.toFixed(2)} units`;
+
+    let perUnit = mgPerMl/scale;
+    perUnitBox.innerText = `${perUnit.toFixed(4)} mg per unit`;
+
+    buildScale(scale);
+
+    const indicator = document.createElement('div');
+    indicator.className='indicator';
+    indicator.style.left = (units/scale*100)+'%';
+    scaleBar.appendChild(indicator);
+}
+
+const vialInput = document.getElementById('vial');
+const diluentInput = document.getElementById('diluent');
+const doseInput = document.getElementById('dose');
+const unitInput = document.getElementById('unit');
+const scaleInput = document.getElementById('scale');
+
+[vialInput,diluentInput,doseInput,unitInput,scaleInput].forEach(el=>{
+    el.addEventListener('input', calculate);
 });
 
 calculate();
