@@ -10,72 +10,113 @@
 <style>
 body {
     margin:0;
-    font-family: 'Inter', sans-serif;
+    font-family:'Inter', sans-serif;
     background: radial-gradient(circle at top, #1a1a1a, #000);
     color:white;
 }
 
+/* HEADER */
 .header {
     text-align:center;
-    padding:15px;
+    padding:10px;
+    background: linear-gradient(90deg, #111, #1c1c1c);
     border-bottom:1px solid #333;
+    position:relative;
+}
+
+.header::before {
+    content:"";
+    position:absolute;
+    inset:0;
+    background: url('https://www.transparenttextures.com/patterns/leather.png');
+    opacity:0.15;
 }
 
 .header img {
-    max-width:180px;
+    max-width:160px;
+    position:relative;
+    z-index:2;
 }
 
 .title {
     font-family:'Rye', cursive;
-    font-size:34px;
+    font-size:28px;
     color:#d4af37;
-    margin-top:10px;
+    margin-top:6px;
+    position:relative;
+    z-index:2;
 }
 
+.badge {
+    position:absolute;
+    right:15px;
+    top:15px;
+    border:1px solid #d4af37;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:12px;
+    color:#d4af37;
+    z-index:2;
+}
+
+/* LAYOUT */
 .container {
     display:flex;
-    gap:15px;
-    padding:15px;
+    gap:12px;
+    padding:12px;
     flex-wrap:wrap;
 }
 
 .card {
     flex:1;
-    min-width:300px;
-    background: linear-gradient(145deg, #1c1c1c, #111);
+    min-width:280px;
+    background: linear-gradient(145deg, #1c1c1c, #0f0f0f);
     border-radius:12px;
-    padding:18px;
-    box-shadow:0 0 20px rgba(212,175,55,0.15);
+    padding:16px;
+    box-shadow:0 0 25px rgba(212,175,55,0.15);
+    position:relative;
 }
 
+.card::before {
+    content:"";
+    position:absolute;
+    inset:0;
+    background:url('https://www.transparenttextures.com/patterns/leather.png');
+    opacity:0.08;
+    border-radius:12px;
+}
+
+.card > * { position:relative; z-index:2; }
+
 h2 {
-    margin-top:0;
+    margin:0 0 10px;
     color:#d4af37;
     font-weight:700;
 }
 
 label {
-    font-size:13px;
-    margin-top:10px;
+    font-size:12px;
+    margin-top:8px;
     display:block;
 }
 
 input, select {
     width:100%;
-    padding:10px;
-    margin-top:5px;
+    padding:8px;
+    margin-top:4px;
     border-radius:6px;
     border:1px solid #333;
     background:#111;
     color:white;
 }
 
+/* PRESETS */
 .presets button {
-    margin:5px;
-    padding:8px 12px;
+    margin:4px;
+    padding:6px 10px;
     border-radius:6px;
-    border:none;
-    background:#222;
+    border:1px solid #333;
+    background:#1a1a1a;
     color:#d4af37;
     cursor:pointer;
 }
@@ -85,37 +126,40 @@ input, select {
     color:black;
 }
 
+/* RESULTS */
 .result {
-    font-size:22px;
-    margin-top:10px;
+    font-size:20px;
     font-weight:700;
 }
 
 .subbox {
-    margin-top:10px;
-    padding:10px;
+    margin-top:8px;
+    padding:8px;
     background:#111;
     border-radius:8px;
+    font-size:14px;
 }
 
+/* SCALE */
 .scale {
-    margin-top:15px;
-    height:50px;
+    margin-top:12px;
+    height:45px;
     background:#111;
     border-radius:10px;
     position:relative;
+    overflow:hidden;
 }
 
 .tick {
     position:absolute;
     bottom:0;
     width:1px;
-    height:10px;
-    background:#999;
+    height:8px;
+    background:#888;
 }
 
 .tick.major {
-    height:20px;
+    height:18px;
     background:#d4af37;
 }
 
@@ -125,12 +169,14 @@ input, select {
     width:4px;
     height:100%;
     background:#d4af37;
+    box-shadow:0 0 10px #d4af37;
 }
 
+/* FOOTER */
 .footer {
     text-align:center;
-    padding:10px;
-    font-size:12px;
+    padding:8px;
+    font-size:11px;
     color:#aaa;
 }
 </style>
@@ -140,12 +186,13 @@ input, select {
 <div class="header">
     <img src="PeptideCowboy.jpg">
     <div class="title">Peptide Cowboy Calculator</div>
+    <div class="badge">Research Use Only</div>
 </div>
 
 <div class="container">
 
 <div class="card">
-<h2>Vial & Dose Settings</h2>
+<h2>Vial & Dose</h2>
 
 <label>Content per vial</label>
 <input id="vial" type="number" value="5">
@@ -169,10 +216,10 @@ input, select {
 </select>
 
 <div class="presets">
-<button onclick="preset(1)">1 MG</button>
-<button onclick="preset(2)">2 MG</button>
-<button onclick="preset(5)">5 MG</button>
-<button onclick="preset(10)">10 MG</button>
+<button onclick="preset(1)">1</button>
+<button onclick="preset(2)">2</button>
+<button onclick="preset(5)">5</button>
+<button onclick="preset(10)">10</button>
 </div>
 
 </div>
