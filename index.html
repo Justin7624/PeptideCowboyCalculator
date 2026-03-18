@@ -1,315 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Peptide Cowboy Calculator</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Rye&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
 <style>
-:root{
-  --gold:#d4af37;
-}
+:root{--gold:#d4af37}
+body{margin:0;font-family:'Inter',sans-serif;background:radial-gradient(circle,#1a1a1a,#000);color:white}
 
-body {
-  margin:0;
-  font-family:'Inter', sans-serif;
-  background: radial-gradient(circle at top, #1a1a1a, #000);
-  color:white;
-  overflow-x:hidden;
-}
+.header{padding:12px 16px;background:linear-gradient(90deg,#111,#1c1c1c);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #333}
+.header h1{font-family:'Rye';color:var(--gold);margin:0;font-size:26px}
+.badge{border:1px solid var(--gold);padding:6px 12px;border-radius:20px;font-size:12px;color:var(--gold)}
 
-/* subtle dust animation */
-body::after{
-  content:"";
-  position:fixed;
-  inset:0;
-  background: radial-gradient(circle, rgba(255,255,255,0.02) 1px, transparent 1px);
-  background-size: 80px 80px;
-  animation: drift 20s linear infinite;
-  pointer-events:none;
-}
-@keyframes drift{
-  from{transform:translateY(0)}
-  to{transform:translateY(200px)}
-}
+.container{display:flex;gap:14px;padding:14px;flex-wrap:wrap}
+.card{flex:1;min-width:300px;background:linear-gradient(145deg,#1c1c1c,#0f0f0f);border-radius:14px;padding:18px;box-shadow:0 0 25px rgba(212,175,55,0.15)}
 
-/* HEADER */
-.header {
-  text-align:center;
-  padding:10px;
-  background: linear-gradient(90deg, #111, #1c1c1c);
-  border-bottom:1px solid #333;
-  position:relative;
-}
-.header::before {
-  content:"";
-  position:absolute;
-  inset:0;
-  background: url('https://www.transparenttextures.com/patterns/leather.png');
-  opacity:0.15;
-}
-.header img {
-  max-width:150px;
-  position:relative;
-  z-index:2;
-}
-.title {
-  font-family:'Rye', cursive;
-  font-size:26px;
-  color:var(--gold);
-  margin-top:6px;
-  position:relative;
-  z-index:2;
-}
-.badge {
-  position:absolute;
-  right:15px;
-  top:12px;
-  border:1px solid var(--gold);
-  padding:5px 10px;
-  border-radius:20px;
-  font-size:11px;
-  color:var(--gold);
-  z-index:2;
-}
+h2{color:var(--gold);margin:0 0 10px}
+p{color:#bbb;font-size:13px}
 
-/* LAYOUT */
-.container {
-  display:flex;
-  gap:12px;
-  padding:12px;
-  flex-wrap:wrap;
-}
-.card {
-  flex:1;
-  min-width:280px;
-  background: linear-gradient(145deg, #1c1c1c, #0f0f0f);
-  border-radius:12px;
-  padding:14px;
-  box-shadow:0 0 25px rgba(212,175,55,0.15);
-  position:relative;
-}
-.card::before {
-  content:"";
-  position:absolute;
-  inset:0;
-  background:url('https://www.transparenttextures.com/patterns/leather.png');
-  opacity:0.08;
-  border-radius:12px;
-}
-.card > * { position:relative; z-index:2; }
+.row{display:flex;gap:10px}
+input,select{width:100%;padding:10px;border-radius:8px;border:1px solid #333;background:#111;color:white}
 
-h2 { color:var(--gold); margin:0 0 8px; }
-label { font-size:11px; margin-top:6px; display:block; }
+.presets button{margin:4px;padding:8px 12px;border-radius:20px;border:1px solid #333;background:#1a1a1a;color:var(--gold);cursor:pointer}
+.presets button:hover{background:var(--gold);color:black}
 
-input, select {
-  width:100%;
-  padding:7px;
-  margin-top:3px;
-  border-radius:6px;
-  border:1px solid #333;
-  background:#111;
-  color:white;
-}
+.result-main{font-size:22px;font-weight:700;margin:10px 0;background:linear-gradient(90deg,#fff,var(--gold),#fff);-webkit-background-clip:text;color:transparent}
 
-/* PRESETS */
-.presets button {
-  margin:3px;
-  padding:5px 8px;
-  border-radius:6px;
-  border:1px solid #333;
-  background:#1a1a1a;
-  color:var(--gold);
-  cursor:pointer;
-  transition:.2s;
-}
-.presets button:hover {
-  background:var(--gold);
-  color:black;
-  transform:scale(1.05);
-}
+.result-grid{display:flex;gap:10px;margin-top:10px}
+.box{flex:1;background:#111;padding:12px;border-radius:10px}
 
-/* RESULTS */
-.result {
-  font-size:20px;
-  font-weight:700;
-  background:linear-gradient(90deg, #fff, var(--gold), #fff);
-  -webkit-background-clip:text;
-  color:transparent;
-  animation: shimmer 3s infinite linear;
-}
-@keyframes shimmer{
-  0%{background-position:-200px}
-  100%{background-position:200px}
-}
+.scaleWrap{margin-top:15px;background:#111;padding:10px;border-radius:14px}
+.scaleBar{height:45px;position:relative;background:#0d0d0d;border-radius:10px}
+.tick{position:absolute;bottom:0;width:1px;height:8px;background:#777}
+.tick.major{height:18px;background:var(--gold)}
+.indicator{position:absolute;top:0;width:4px;height:100%;background:var(--gold);box-shadow:0 0 12px var(--gold)}
 
-.subbox {
-  margin-top:6px;
-  padding:6px;
-  background:#111;
-  border-radius:8px;
-  font-size:13px;
-}
-
-.copyBtn{
-  margin-top:6px;
-  padding:6px;
-  width:100%;
-  background:var(--gold);
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-/* SCALE */
-.scale {
-  margin-top:10px;
-  height:40px;
-  background:#111;
-  border-radius:10px;
-  position:relative;
-  overflow:hidden;
-}
-.tick {
-  position:absolute;
-  bottom:0;
-  width:1px;
-  height:7px;
-  background:#777;
-}
-.tick.major { height:15px; background:var(--gold); }
-.indicator {
-  position:absolute;
-  top:0;
-  width:4px;
-  height:100%;
-  background:var(--gold);
-  box-shadow:0 0 12px var(--gold);
-}
-
-.footer {
-  text-align:center;
-  padding:6px;
-  font-size:10px;
-  color:#aaa;
-}
+.footer{text-align:center;font-size:12px;color:#aaa;padding:8px}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <img src="PeptideCowboy.jpg">
-  <div class="title">Peptide Cowboy Calculator</div>
-  <div class="badge">Research Use Only</div>
+<h1>Peptide Cowboy Calculator</h1>
+<div class="badge">Research Use Only</div>
 </div>
 
 <div class="container">
 
 <div class="card">
-<h2>Vial & Dose</h2>
-<label>Content per vial</label>
-<input id="vial" type="number" value="5">
+<h2>Vial & Dose Settings</h2>
+<p>Enter vial strength, diluent, and desired dose.</p>
 
-<label>Total diluent (mL)</label>
+<div class="row">
+<input id="vial" type="number" value="5">
+<select id="unitVial"><option>mg</option></select>
+</div>
+
+<label>Total Diluent Added (mL)</label>
 <input id="diluent" type="number" value="1">
 
-<label>Desired dose</label>
+<label>Insulin Syringe Scale</label>
+<select id="scale"><option value="100">100 units</option><option value="50">50 units</option></select>
+
+<label>Desired Dose</label>
+<div class="row">
 <input id="dose" type="number" value="0.5">
+<select id="doseUnit"><option value="mg">mg</option><option value="mcg">mcg</option></select>
+</div>
 
-<label>Unit</label>
-<select id="unit">
-<option value="mg">mg</option>
-<option value="mcg">mcg</option>
-</select>
-
-<label>Syringe scale</label>
-<select id="scale">
-<option value="100">100 units</option>
-<option value="50">50 units</option>
-</select>
-
+<p>Quick presets</p>
 <div class="presets">
-<button onclick="preset(1)">1</button>
-<button onclick="preset(2)">2</button>
-<button onclick="preset(5)">5</button>
-<button onclick="preset(10)">10</button>
+<button onclick="preset(1)">1 MG</button>
+<button onclick="preset(2)">2 MG</button>
+<button onclick="preset(5)">5 MG</button>
+<button onclick="preset(10)">10 MG</button>
 </div>
 
 </div>
 
 <div class="card">
 <h2>Pull This Amount</h2>
-<div class="result" id="mainResult">—</div>
-<div class="subbox" id="unitsBox"></div>
-<div class="subbox" id="perUnitBox"></div>
-<button class="copyBtn" onclick="copyResult()">Copy Result</button>
-<div class="scale" id="scaleBar"></div>
+<p>The calculator converts your dose into syringe units.</p>
+
+<div class="result-main" id="mainResult"></div>
+<p id="mlText"></p>
+
+<div class="result-grid">
+<div class="box" id="unitsBox"></div>
+<div class="box" id="perUnitBox"></div>
 </div>
+
+<div class="scaleWrap">
+<div class="scaleBar" id="scaleBar"></div>
+</div>
+
+<p style="margin-top:10px;font-size:12px;color:#888">Visual helper only — not a medical device.</p>
 
 </div>
 
-<div class="footer">Research use only — not medical advice.</div>
+</div>
+
+<div class="footer">Research use only. Not medical advice.</div>
 
 <script>
-function preset(val){
-  doseInput.value = val;
-  calculate();
-}
+function preset(v){dose.value=v;calculate()}
 
 function buildScale(max){
-  const bar = document.getElementById('scaleBar');
-  bar.innerHTML='';
-  for(let i=0;i<=max;i++){
-    const t=document.createElement('div');
-    t.className='tick '+(i%10===0?'major':'');
-    t.style.left=(i/max*100)+'%';
-    bar.appendChild(t);
-  }
+scaleBar.innerHTML='';
+for(let i=0;i<=max;i++){
+let t=document.createElement('div');
+t.className='tick '+(i%10===0?'major':'');
+t.style.left=(i/max*100)+'%';
+scaleBar.appendChild(t)
+}
 }
 
 function calculate(){
-  let vial=parseFloat(vialInput.value);
-  let diluent=parseFloat(diluentInput.value);
-  let dose=parseFloat(doseInput.value);
-  let unit=unitInput.value;
-  let scale=parseFloat(scaleInput.value);
+let vialVal=parseFloat(vial.value)
+let dil=parseFloat(diluent.value)
+let doseVal=parseFloat(dose.value)
+let unit=doseUnit.value
+let scaleVal=parseFloat(scale.value)
 
-  if(unit==='mcg') dose/=1000;
+if(unit==='mcg') doseVal/=1000
 
-  let mgPerMl=vial/diluent;
-  let ml=dose/mgPerMl;
-  let units=ml*scale;
+let mgPerMl=vialVal/dil
+let ml=doseVal/mgPerMl
+let units=ml*scaleVal
 
-  mainResult.innerText=`Draw to ${units.toFixed(2)} units`;
-  unitsBox.innerText=`${units.toFixed(2)} units`;
-  perUnitBox.innerText=`${(mgPerMl/scale).toFixed(4)} mg per unit`;
+mainResult.innerText=`For a dose of ${dose.value} ${unit}, draw to ${units.toFixed(2)} units.`
+mlText.innerText=`≈ ${ml.toFixed(3)} mL`
+unitsBox.innerText=`${units.toFixed(2)} units`
+perUnitBox.innerText=`${(mgPerMl/scaleVal).toFixed(4)} mg / unit`
 
-  buildScale(scale);
-  const ind=document.createElement('div');
-  ind.className='indicator';
-  ind.style.left=(units/scale*100)+'%';
-  scaleBar.appendChild(ind);
+buildScale(scaleVal)
+let ind=document.createElement('div')
+ind.className='indicator'
+ind.style.left=(units/scaleVal*100)+'%'
+scaleBar.appendChild(ind)
 }
 
-function copyResult(){
-  navigator.clipboard.writeText(mainResult.innerText);
-  alert('Copied');
-}
-
-const vialInput=document.getElementById('vial');
-const diluentInput=document.getElementById('diluent');
-const doseInput=document.getElementById('dose');
-const unitInput=document.getElementById('unit');
-const scaleInput=document.getElementById('scale');
-
-[vialInput,diluentInput,doseInput,unitInput,scaleInput].forEach(el=>{
-  el.addEventListener('input',calculate);
-});
-
-calculate();
+[vial,diluent,dose,doseUnit,scale].forEach(e=>e.addEventListener('input',calculate))
+calculate()
 </script>
 
 </body>
