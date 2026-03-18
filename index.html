@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peptide Cowboy Calculator</title>
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0b0b0b;
+    color: #fff;
+}
+
+.header {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(90deg, #0b0b0b, #1c1c1c);
+}
+
+.header img {
+    max-width: 200px;
+}
+
+.title {
+    font-size: 36px;
+    font-weight: bold;
+    margin-top: 10px;
+    color: #ffffff;
+}
+
+.container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    flex-wrap: wrap;
+}
+
+.card {
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 20px;
+    flex: 1;
+    min-width: 300px;
+}
+
+h2 {
+    margin-top: 0;
+    color: #d4af37;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 6px;
+    border: none;
+    background: #2a2a2a;
+    color: white;
+}
+
+.result {
+    font-size: 22px;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+.footer {
+    text-align: center;
+    padding: 10px;
+    font-size: 12px;
+    background: #111;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <img src="PeptideCowboy.jpg" alt="logo">
+    <div class="title">Peptide Cowboy Calculator</div>
+</div>
+
+<div class="container">
+
+<div class="card">
+<h2>Vial & Dose Settings</h2>
+
+<label>Content per vial (mg)</label>
+<input type="number" id="vial" value="5">
+
+<label>Total diluent added (mL)</label>
+<input type="number" id="diluent" value="1">
+
+<label>Desired dose (mg)</label>
+<input type="number" id="dose" value="0.5">
+
+<label>Insulin syringe scale</label>
+<select id="scale">
+<option value="100">100 units</option>
+<option value="50">50 units</option>
+</select>
+
+</div>
+
+<div class="card">
+<h2>Result</h2>
+<div class="result" id="output">—</div>
+</div>
+
+</div>
+
+<div class="footer">Research use only. Not medical advice.</div>
+
+<script>
+function calculate() {
+    const vial = parseFloat(document.getElementById('vial').value);
+    const diluent = parseFloat(document.getElementById('diluent').value);
+    const dose = parseFloat(document.getElementById('dose').value);
+    const scale = parseFloat(document.getElementById('scale').value);
+
+    if (!vial || !diluent || !dose) return;
+
+    const mgPerMl = vial / diluent;
+    const mlNeeded = dose / mgPerMl;
+    const units = mlNeeded * scale;
+
+    document.getElementById('output').innerText = `Draw to ${units.toFixed(2)} units`;
+}
+
+['vial','diluent','dose','scale'].forEach(id => {
+    document.getElementById(id).addEventListener('input', calculate);
+});
+
+calculate();
+</script>
+
+</body>
+</html>
