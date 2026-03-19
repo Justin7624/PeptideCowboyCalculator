@@ -651,25 +651,29 @@
     .reset-btn:hover{color:#ffffff;border-color:rgba(255,255,255,.18)}
    
   
-  @media (max-width: 600px){
-    .hero{
-      position: relative;
-    }
-  
-    .hero-copy{
-      position: relative;
-    }
-  
-    .pill{
-      position: absolute;
-      left: 12px;
-      bottom: 10px;
-      margin-top: 0;
-      order: initial;
-      z-index: 5;
-    }
+@media (max-width: 600px){
+
+  /* Stack header content */
+  .hero-copy{
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:8px;
   }
 
+  /* Force single line title */
+  .hero-copy h1{
+    white-space:nowrap;
+    font-size:clamp(1.6rem, 5vw, 2rem);
+  }
+
+  /* Move badge BELOW title */
+  .pill{
+    order:2;
+    margin-top:4px;
+  }
+
+  /* Give image more room */
   .hero-inner{
     min-height:140px;
     padding:8px 12px;
