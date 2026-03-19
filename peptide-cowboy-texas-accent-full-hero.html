@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b0b0b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Peptide Cowboy • Dose Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rye&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#070707;
+      --bg-soft:#0d0d0d;
+      --panel:#101010;
+      --panel-2:#121212;
+      --field:#070707;
+      --text:#f6f1e7;
+      --text-strong:#ffffff;
+      --muted:#cfd6e4;
+      --line:rgba(255,255,255,.12);
+      --line-strong:rgba(255,255,255,.22);
+      --gold-1:#ffffff;
+      --gold-2:#bf1e2e;
+      --gold-3:#002868;
+      --gold-4:#8b1e2d;
+      --accent-red:#bf1e2e;
+      --accent-blue:#002868;
+      --accent-white:#ffffff;
+      --silver:#d8d0c2;
+      --shadow:0 26px 70px rgba(212,175,55,.12);
+      --shadow-soft:0 18px 40px rgba(212,175,55,.08);
+      --radius:26px;
+      --warn:#ffcf78;
+    }
+
+
+
+    --glow-gold:rgba(212,175,55,.24);
+    --glow-soft:rgba(255,230,151,.16);
+    --toast-bg:rgba(8,8,8,.94);
+    }
+
+    @keyframes headlineShimmer{
+      0%{background-position:0% 50%}
+      100%{background-position:200% 50%}
+    }
+
+    @keyframes pulseGlow{
+      0%,100%{box-shadow:0 0 0 rgba(212,175,55,0), 0 0 0 rgba(212,175,55,0)}
+      50%{box-shadow:0 0 20px rgba(212,175,55,.16), 0 0 40px rgba(212,175,55,.08)}
+    }
+
+    @keyframes fadeUp{
+      0%{opacity:0; transform:translateY(8px)}
+      100%{opacity:1; transform:translateY(0)}
+    }
+
+    @keyframes toastInOut{
+      0%{opacity:0; transform:translate(-50%, 10px)}
+      10%,85%{opacity:1; transform:translate(-50%, 0)}
+      100%{opacity:0; transform:translate(-50%, 6px)}
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--text);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background:
+        radial-gradient(1000px 620px at 10% -10%, rgba(0,40,104,.20), transparent 60%),
+        radial-gradient(840px 520px at 100% 0%, rgba(191,30,46,.16), transparent 58%),
+        radial-gradient(900px 720px at 50% 115%, rgba(255,255,255,.06), transparent 58%),
+        linear-gradient(180deg, #070707 0%, #090909 30%, #050505 66%, #020202 100%);
+      line-height:1.45;
+      overflow-x:hidden;
+      position:relative;
+    }
+
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      inset:auto;
+      border-radius:50%;
+      pointer-events:none;
+      z-index:-1;
+      filter:blur(18px);
+      opacity:.45;
+    }
+
+    body::before{
+      width:340px;
+      height:340px;
+      top:110px;
+      left:-90px;
+      background:radial-gradient(circle at 35% 35%, rgba(0,40,104,.42), rgba(0,40,104,.08) 55%, transparent 72%);
+    }
+
+    body::after{
+      width:300px;
+      height:300px;
+      right:-80px;
+      bottom:90px;
+      background:radial-gradient(circle at 35% 35%, rgba(191,30,46,.34), rgba(191,30,46,.06) 55%, transparent 72%);
+    }
+
+    .shell{
+      max-width:1220px;
+      margin:0 auto;
+      padding:0 18px 10px;
+      position:relative;
+      transform: scale(1.00);
+      transform-origin: top center;
+      margin-bottom: -0px; /* pulls footer up cleanly */
+    }
+
+
+    .hero{
+      overflow:hidden;
+      position:relative;
+      z-index:10;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background:#050505;
+      box-shadow:0 8px 24px rgba(0,0,0,.28);
+      min-height: 250px;
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:linear-gradient(to bottom, rgba(0,0,0,.05), rgba(0,0,0,.18));
+      opacity:1;
+      z-index:1;
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 18% 20%, rgba(0,40,104,.20), transparent 24%),
+        radial-gradient(circle at 82% 18%, rgba(191,30,46,.18), transparent 22%),
+        linear-gradient(90deg, rgba(0,40,104,.12) 0%, rgba(255,255,255,0) 32%, rgba(255,255,255,0) 68%, rgba(191,30,46,.12) 100%);
+      z-index:2;
+    }
+
+    .hero-inner{
+      max-width:1280px;
+      margin:0 auto;
+      padding:16px 20px;
+      min-height:250px;
+      display:flex;
+      align-items:flex-start;
+      position:relative;
+      z-index:3;
+    }
+
+    .hero-copy{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      width:100%;
+      margin-top:0;
+    }
+
+    .hero-copy h1{
+      margin:0;
+      font-family:'Rye', serif;
+      font-size:clamp(2rem, 2.9vw, 3.2rem);
+      line-height:.98;
+      font-weight:400;
+      letter-spacing:.01em;
+      color:#ffffff;
+      text-shadow:
+        0 0 10px rgba(255,255,255,.16),
+        0 0 22px rgba(0,40,104,.28);
+      animation:none;
+    }
+
+    .hero-kicker{
+      margin:8px 0 0;
+      font-size:.74rem;
+      color:#d9e3ff;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight:800;
+    }
+
+    .hero-media{
+      position:absolute;
+      inset:0;
+      z-index:0;
+    }
+
+    .hero-media img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      object-position:center;
+      transform:scale(0.96);
+      opacity:1;
+      filter:contrast(1.05) brightness(1) saturate(1.05);
+      display:block;
+    }
+
+    .pill{
+      padding:10px 14px;
+      border-radius:999px;
+      white-space:nowrap;
+      border:1px solid rgba(255,255,255,.24);
+      background:rgba(0,40,104,.34);
+      backdrop-filter:blur(6px);
+      color:#ffffff;
+      font-weight:900;
+      font-size:.76rem;
+      letter-spacing:.02em;
+      box-shadow:0 12px 30px rgba(0,40,104,.18);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);
+      gap:14px;
+      margin-top:14px;
+    }
+
+    @media (max-width:900px){
+      .grid{grid-template-columns:1fr;}
+      .hero-copy{flex-direction:column; align-items:flex-start;}
+    }
+
+    .panel{
+      position:relative;
+      background:
+        radial-gradient(500px 240px at 100% 0%, rgba(0,40,104,.08), transparent 60%),
+        radial-gradient(480px 240px at 0% 100%, rgba(191,30,46,.10), transparent 55%),
+        linear-gradient(180deg, rgba(16,16,16,.98), rgba(10,10,10,.97) 30%, rgba(7,7,7,.95));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--radius);
+      box-shadow:0 26px 70px rgba(0,0,0,.28);
+      overflow:hidden;
+      isolation:isolate;
+    }
+
+    .panel::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.04), transparent 35%, transparent 72%, rgba(191,30,46,.04)),
+        radial-gradient(circle at 15% 18%, rgba(0,40,104,.08), transparent 18%),
+        radial-gradient(circle at 88% 14%, rgba(255,255,255,.05), transparent 16%);
+      opacity:.95;
+    }
+
+    .panel::after{
+      content:"";
+      position:absolute;
+      width:180px;
+      height:180px;
+      right:-70px;
+      top:-60px;
+      background:radial-gradient(circle at 40% 40%, rgba(0,40,104,.12), transparent 65%);
+      filter:blur(10px);
+      z-index:-1;
+      pointer-events:none;
+    }
+
+    .panel-inner{
+      position:relative;
+      padding:18px;
+    }
+
+    .panel-head{
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      align-items:flex-start;
+      margin-bottom:12px;
+    }
+
+    .panel-head h2{
+      margin:0;
+      font-size:1.05rem;
+      font-weight:950;
+      letter-spacing:.09em;
+      text-transform:uppercase;
+      color:#ffffff;
+    }
+
+    .sub{
+      font-size:.76rem;
+      color:var(--muted);
+      margin-top:6px;
+      max-width:48ch;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(12,minmax(0,1fr));
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .field{
+      grid-column:span 6;
+      display:flex;
+      flex-direction:column;
+      gap:5px;
+    }
+
+    .field.short{grid-column:span 4;}
+    .field.wide{grid-column:span 12;}
+
+    @media (max-width:900px){
+      .field,.field.short,.field.wide{grid-column:span 12;}
+    }
+
+    label{
+      display:flex;
+      align-items:flex-end;
+      min-height:2.15em;
+      font-size:.75rem;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.09em;
+      font-weight:900;
+      line-height:1.25;
+    }
+
+    input, select{
+      width:100%;
+      background:linear-gradient(180deg, rgba(8,8,8,.99), rgba(4,4,4,.98));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:16px;
+      color:var(--text);
+      padding:11px 13px;
+      font-size:.88rem;
+      outline:none;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.04),
+        0 12px 24px rgba(212,175,55,.05);
+    }
+
+    input::placeholder{color:#8f8267;}
+
+    input:focus, select:focus{
+      border-color:rgba(0,40,104,.55);
+      box-shadow:
+        0 0 0 4px rgba(0,40,104,.18),
+        inset 0 1px 0 rgba(255,255,255,.06),
+        0 14px 28px rgba(0,40,104,.10);
+    }
+
+    select{color-scheme:dark;}
+    select option{
+      background:#0a0a0a;
+      color:#f6f1e7;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 110px;
+      gap:8px;
+      align-items:stretch;
+    }
+
+    .field > input,
+    .field > select,
+    .row > input,
+    .row > select{
+      min-height:54px;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .chip{
+      border:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(180deg, rgba(14,18,28,.96), rgba(8,8,8,.94));
+      color:#ffffff;
+      padding:9px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:900;
+      font-size:.76rem;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      transition:transform .06s ease, border-color .15s ease, background .15s ease, color .15s ease, box-shadow .15s ease;
+      box-shadow:0 10px 20px rgba(0,40,104,.08);
+    }
+
+    .chip:hover{
+      border-color:rgba(255,255,255,.18);
+      background:linear-gradient(180deg, rgba(16,22,40,.98), rgba(10,10,10,.98));
+      color:#ffffff;
+      box-shadow:0 12px 26px rgba(0,40,104,.10);
+    }
+
+    .chip:active{transform:translateY(1px) scale(.99);}
+
+    .chip:focus-visible,
+    .reset-btn:focus-visible,
+    input:focus-visible,
+    select:focus-visible{
+      outline:none;
+      box-shadow:0 0 0 4px rgba(0,40,104,.18), 0 0 0 1px rgba(255,255,255,.10) inset;
+    }
+
+
+    .chip.ghost{
+      background:transparent;
+      color:var(--muted);
+      box-shadow:none;
+    }
+
+    .headline{
+      font-size:clamp(1.2rem,2vw,1.76rem);
+      font-weight:950;
+      line-height:1.22;
+      letter-spacing:.01em;
+      color:var(--text);
+      margin-top:10px;
+      transition:transform .18s ease, filter .18s ease;
+    }
+
+    .headline.is-updated{
+      animation:pulseGlow .55s ease;
+    }
+
+    .headline .hl{
+      background:linear-gradient(90deg, #ffffff 0%, #cfdfff 20%, #002868 42%, #ffffff 56%, #bf1e2e 76%, #ffffff 100%);
+      background-size:200% auto;
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      animation:headlineShimmer 7s linear infinite;
+    }
+
+    .meta{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:.88rem;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+      margin-top:12px;
+    }
+
+    .stat{
+      border-radius:18px;
+      padding:12px 12px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(10,10,10,.98), rgba(5,5,5,.96));
+      box-shadow:0 18px 40px rgba(0,0,0,.24);
+      min-height:100px;
+    }
+
+    .stat b{
+      display:block;
+      font-size:.73rem;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+
+    .classic{
+      margin-top:6px;
+      padding:12px;
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(10,10,10,.98), rgba(5,5,5,.95));
+      box-shadow:0 18px 40px rgba(0,0,0,.24);
+    }
+
+    .tube{
+      position:relative;
+      height:34px;
+      border-radius:999px;
+      overflow:hidden;
+      background:linear-gradient(180deg, #121212, #0a0a0a 68%);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:
+        inset 0 4px 10px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .fill{
+      position:absolute;
+      inset:0 auto 0 0;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg, #002868 0%, #1f5fb8 24%, #ffffff 50%, #d24b58 74%, #bf1e2e 100%);
+      box-shadow:inset 0 0 16px rgba(255,255,255,.12), 0 0 20px rgba(31,95,184,.16);
+    }
+
+    .cursor{
+      position:absolute;
+      top:-4px;
+      width:3px;
+      height:42px;
+      border-radius:4px;
+      background:linear-gradient(180deg, #ffffff, #bf1e2e);
+      box-shadow:0 0 0 2px rgba(255,255,255,.16), 0 0 16px rgba(191,30,46,.18);
+    }
+
+    .ticks{
+      position:relative;
+      height:34px;
+      margin-top:6px;
+      margin-bottom:4px;
+      padding:0 2px;
+    }
+
+    .tick{
+      position:absolute;
+      bottom:12px;
+      width:1px;
+      background:rgba(255,255,255,.22);
+      transform:translateX(-.5px);
+    }
+
+    .tick.minor{
+      height:8px;
+      opacity:1;
+    }
+
+    .tick.mid{
+      height:13px;
+      opacity:1;
+      background:rgba(0,40,104,.58);
+    }
+
+    .tick.major{
+      height:18px;
+      opacity:1;
+      background:rgba(191,30,46,.8);
+    }
+
+    .tick .n{
+      position:absolute;
+      top:14px;
+      left:50%;
+      transform:translateX(-50%);
+      font-size:.68rem;
+      color:#d3d9e6;
+      white-space:nowrap;
+    }
+
+    .warn{
+      margin-top:12px;
+      color:#ff6b78;
+      font-size:.84rem;
+      font-weight:900;
+      display:none;
+      line-height:1.35;
+      letter-spacing:.01em;
+    }
+
+    .note{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:.78rem;
+    }
+
+
+    .copy-btn:hover{
+      border-color:rgba(255,255,255,.18);
+      color:#fff6cf;
+      box-shadow:0 12px 26px rgba(0,40,104,.10);
+    }
+
+    .copy-btn:active{transform:translateY(1px) scale(.99);}
+
+
+
+    .footer{
+      color:#efe4ca;
+      position:relative;
+      left:0;
+      right:0;
+      bottom:0;
+      z-index:30;
+      border-top:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(90deg, rgba(35,28,8,.95), rgba(90,68,16,.95) 55%, rgba(212,175,55,.82));
+      backdrop-filter: blur(10px);
+      box-shadow:0 -8px 24px rgba(212,175,55,.08);
+      margin-top:10px;
+    }
+
+    .foot-wrap{
+      max-width:1180px;
+      margin:0 auto;
+      padding:10px 18px;
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .small{
+      font-size:.76rem;
+      color:inherit;
+      opacity:.92;
+    }
+
+    input[type="number"]{
+      appearance:textfield;
+      -webkit-appearance:textfield;
+      -moz-appearance:textfield;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button{
+      -webkit-appearance:none;
+      margin:0;
+    }
+
+    .reset-btn{
+      padding:10px 14px;
+      min-width:82px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(180deg, rgba(14,18,28,.96), rgba(8,8,8,.94));
+      color:var(--muted);
+      font-weight:900;
+      font-size:.76rem;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      cursor:pointer;
+      box-shadow:0 18px 40px rgba(0,0,0,.24);
+    }
+    .reset-btn:hover{color:#ffffff;border-color:rgba(255,255,255,.18)}
+   
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-media">
+      <img src="PeptideCowboy.jpg" alt="Peptide Cowboy">
+    </div>
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <div>
+          <h1>Peptide Cowboy Calculator</h1>
+          <div class="hero-kicker">Texas Edition • Full Brand Focus</div>
+        </div>
+        <div class="pill">Research Use Only</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="grid">
+      <section class="panel">
+        <div class="panel-inner">
+          <div class="panel-head">
+            <div>
+              <h2>Vial & Dose Settings</h2>
+              <div class="sub">Enter the vial strength, how much diluent you added, and the dose you want to pull.</div>
+            </div>
+            <button class="reset-btn" id="resetBtn" type="button">Reset</button>
+          </div>
+
+          <div class="form-grid">
+            <div class="field short">
+              <label>Content Per Vial</label>
+              <div class="row">
+                <input id="contentPerVial" type="number" value="5" step="any" />
+                <select id="contentUnit">
+                  <option value="mg" selected>mg</option>
+                  <option value="iu">IU</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field short">
+              <label>Total Diluent Added (mL)</label>
+              <input id="diluentMl" type="number" value="1" step="any" />
+            </div>
+
+            <div class="field short">
+              <label>Insulin Syringe Scale</label>
+              <select id="syringeScale">
+                <option value="100" selected>100 units</option>
+                <option value="50">50 units</option>
+              </select>
+            </div>
+
+            <div class="field wide">
+              <label>Desired Dose</label>
+              <div class="row">
+                <input id="desiredDose" type="number" value="0.5" step="any" />
+                <select id="doseUnit">
+                  <option value="mg" selected>mg</option>
+                  <option value="mcg">mcg</option>
+                  <option value="iu">IU</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="sub" style="margin-top:14px;max-width:none">Quick presets (mg / mcg only)</div>
+          <div class="chips" style="margin-top:8px">
+            <button class="chip" type="button" data-dose="1">1 MG</button>
+            <button class="chip" type="button" data-dose="2">2 MG</button>
+            <button class="chip" type="button" data-dose="5">5 MG</button>
+            <button class="chip" type="button" data-dose="10">10 MG</button>
+          </div>
+
+          <div class="note" style="margin-top:12px">Assumes a U-100 insulin syringe where <strong>1 unit = 0.01 mL</strong>. Values update instantly.</div>
+          <div class="warn" id="warn"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-inner">
+          <div class="panel-head" style="margin-bottom:0">
+            <div>
+              <h2>Pull This Amount</h2>
+              <div class="sub">The calculator converts your desired dose into syringe units and fill volume.</div>
+            </div>
+          </div>
+
+          <div class="headline" id="headline" style="margin-top:10px"></div>
+          <div class="meta" id="meta"></div>
+
+          <div class="stats">
+            <div class="stat">
+              <b>Units to Pull</b>
+              <div id="unitsBox" style="font-size:1rem;margin-top:2px"></div>
+            </div>
+            <div class="stat">
+              <b>Per Syringe Unit</b>
+              <div id="perUnitBox" style="font-size:1rem;margin-top:2px"></div>
+              <div id="perUnitMcg" style="margin-top:4px;color:var(--muted);font-size:.76rem"></div>
+            </div>
+          </div>
+
+          <div class="classic">
+            <div class="tube">
+              <div class="fill" id="fill"></div>
+              <div class="cursor" id="cursor"></div>
+            </div>
+            <div class="ticks" id="ticks"></div>
+          </div>
+
+          <div class="note">Visual helper only — not a medical device.</div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="foot-wrap">
+      <div class="small">Research use only. Not medical advice.</div>
+      <div class="small">Always verify your label, concentration, and syringe scale.</div>
+    </div>
+  </footer>
+
+  <script>
+    const STORAGE_KEY = 'peptide-cowboy-calculator-state-v1';
+
+    const defaults = {
+      contentPerVial: 5,
+      diluentMl: 1,
+      syringeScale: 100,
+      desiredDose: 0.5,
+      doseUnit: 'mg'
+    };
+
+    const els = {
+      contentPerVial: document.getElementById('contentPerVial'),
+      contentUnit: document.getElementById('contentUnit'),
+      diluentMl: document.getElementById('diluentMl'),
+      syringeScale: document.getElementById('syringeScale'),
+      desiredDose: document.getElementById('desiredDose'),
+      doseUnit: document.getElementById('doseUnit'),
+      headline: document.getElementById('headline'),
+      meta: document.getElementById('meta'),
+      unitsBox: document.getElementById('unitsBox'),
+      perUnitBox: document.getElementById('perUnitBox'),
+      perUnitMcg: document.getElementById('perUnitMcg'),
+      warn: document.getElementById('warn'),
+      fill: document.getElementById('fill'),
+      cursor: document.getElementById('cursor'),
+      ticks: document.getElementById('ticks'),
+      resetBtn: document.getElementById('resetBtn'),
+    };
+
+
+    async function copyText(text){
+      try{
+        if(navigator.clipboard && window.isSecureContext){
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+      }catch(err){
+      }
+
+      const temp = document.createElement('textarea');
+      temp.value = text;
+      temp.setAttribute('readonly', '');
+      temp.style.position = 'absolute';
+      temp.style.left = '-9999px';
+      document.body.appendChild(temp);
+      temp.select();
+      temp.setSelectionRange(0, temp.value.length);
+      let ok = false;
+      try{
+        ok = document.execCommand('copy');
+      }catch(err){
+        ok = false;
+      }
+      document.body.removeChild(temp);
+      return ok;
+    }
+
+    function saveState(){
+      const payload = {
+        contentPerVial: els.contentPerVial.value,
+        diluentMl: els.diluentMl.value,
+        syringeScale: els.syringeScale.value,
+        desiredDose: els.desiredDose.value,
+        doseUnit: els.doseUnit.value,
+        contentUnit: els.contentUnit.value
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    }
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return;
+        const payload = JSON.parse(raw);
+        if(payload.contentPerVial != null) els.contentPerVial.value = payload.contentPerVial;
+        if(payload.diluentMl != null) els.diluentMl.value = payload.diluentMl;
+        if(payload.syringeScale != null) els.syringeScale.value = payload.syringeScale;
+        if(payload.desiredDose != null) els.desiredDose.value = payload.desiredDose;
+        if(payload.doseUnit != null) els.doseUnit.value = payload.doseUnit;
+        if(payload.contentUnit != null) els.contentUnit.value = payload.contentUnit;
+      }catch(err){
+      }
+    }
+
+
+    function triggerResultPulse(){
+      els.headline.classList.remove('is-updated');
+      void els.headline.offsetWidth;
+      els.headline.classList.add('is-updated');
+    }
+
+    function toNumber(v){
+      const n = parseFloat(v);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function formatDoseDisplay(value, unit){
+      return `${value} ${unit}`;
+    }
+
+    function buildTicks(max){
+      els.ticks.innerHTML = '';
+      for(let i = 0; i <= max; i++){
+        const tick = document.createElement('div');
+        tick.className = 'tick ' + (i % 10 === 0 ? 'major' : i % 5 === 0 ? 'mid' : 'minor');
+        tick.style.left = `${(i / max) * 100}%`;
+        if(i % 10 === 0){
+          const n = document.createElement('div');
+          n.className = 'n';
+          n.textContent = i;
+          tick.appendChild(n);
+        }
+        els.ticks.appendChild(tick);
+      }
+    }
+
+    let lastResultSnapshot = '';
+
+    async function maybeAutoCopy(){
+      if(!els.autoCopyToggle.checked) return;
+      const copied = await copyText(getResultText());
+      if(copied) showToast('Result copied automatically');
+    }
+
+    function calculate(){
+      const contentPerVial = toNumber(els.contentPerVial.value);
+      const diluentMl = toNumber(els.diluentMl.value);
+      const desiredDoseInput = toNumber(els.desiredDose.value);
+      const scale = toNumber(els.syringeScale.value);
+      const doseUnit = els.doseUnit.value;
+      const contentUnit = (els.contentUnit.value || 'mg').toLowerCase();
+
+      if(contentPerVial <= 0 || diluentMl <= 0 || desiredDoseInput < 0 || scale <= 0){
+        els.warn.style.display = 'block';
+        els.warn.textContent = '⚠ Enter values greater than 0.';
+        els.headline.innerHTML = 'For a dose of <span class="hl">—</span>, draw to <span class="hl">—</span>.';
+        els.meta.textContent = '≈ 0.000 mL (units × 0.01 mL)';
+        els.unitsBox.textContent = '—';
+        els.perUnitBox.textContent = '—';
+        els.perUnitMcg.textContent = '';
+        els.fill.style.width = '0%';
+        els.cursor.style.left = '0%';
+        buildTicks(scale || 100);
+        return;
+      }
+
+      const isDoseIU = doseUnit === 'iu';
+      const isVialIU = contentUnit === 'iu';
+      const isMismatch =
+        (isVialIU && (doseUnit === 'mg' || doseUnit === 'mcg')) ||
+        (!isVialIU && isDoseIU);
+
+      if(isMismatch){
+        els.warn.style.display = 'block';
+        els.warn.textContent = `⚠ Unit mismatch: this vial is in ${contentUnit}, but the desired dose is in ${doseUnit}. mg ↔ IU conversion needs a product-specific factor.`;
+        els.headline.innerHTML = 'For a dose of <span class="hl">—</span>, draw to <span class="hl">—</span>.';
+        els.meta.textContent = '≈ 0.000 mL (units × 0.01 mL)';
+        els.unitsBox.textContent = '—';
+        els.perUnitBox.textContent = '—';
+        els.perUnitMcg.textContent = '';
+        els.fill.style.width = '0%';
+        els.cursor.style.left = '0%';
+        buildTicks(scale);
+        saveState();
+        return;
+      }
+
+      els.warn.style.display = 'none';
+      els.warn.textContent = '';
+
+      let doseForCalc;
+      if(doseUnit === 'mcg'){
+        doseForCalc = desiredDoseInput / 1000;
+      } else {
+        doseForCalc = desiredDoseInput;
+      }
+
+      const amountPerMl = contentPerVial / diluentMl;
+      const units = (doseForCalc / amountPerMl) * scale;
+      const fillMl = units * (1 / scale);
+      const amountPerUnit = amountPerMl / scale;
+      const safeUnits = Math.max(0, Math.min(units, scale));
+      const percent = (safeUnits / scale) * 100;
+
+      els.headline.innerHTML = `For a dose of <span class="hl">${formatDoseDisplay(els.desiredDose.value, doseUnit)}</span>, draw to <span class="hl">${units.toFixed(2)} units</span>.`;
+      els.meta.textContent = `≈ ${fillMl.toFixed(3)} mL (units × ${(1/scale).toFixed(2)} mL)`;
+      els.unitsBox.textContent = `${units.toFixed(2)} units`;
+
+      if(contentUnit === 'iu'){
+        els.perUnitBox.textContent = `${amountPerUnit.toFixed(4)} iu / unit`;
+        els.perUnitMcg.textContent = '';
+      } else {
+        const mcgPerUnit = amountPerUnit * 1000;
+        els.perUnitBox.textContent = `${amountPerUnit.toFixed(4)} mg / unit`;
+        els.perUnitMcg.textContent = `≈ ${mcgPerUnit.toFixed(2)} mcg per unit`;
+      }
+
+      els.fill.style.width = `${percent}%`;
+      els.cursor.style.left = `${percent}%`;
+      buildTicks(scale);
+
+      const resultSnapshot = `${units.toFixed(4)}|${fillMl.toFixed(4)}|${amountPerUnit.toFixed(6)}|${doseUnit}|${els.desiredDose.value}|${scale}|${contentUnit}`;
+      if(resultSnapshot !== lastResultSnapshot){
+        triggerResultPulse();
+        lastResultSnapshot = resultSnapshot;
+      }
+
+      if(units > scale){
+        els.warn.style.display = 'block';
+        els.warn.textContent = `⚠ Dose exceeds the selected syringe scale of ${scale} units.`;
+      }
+
+      saveState();
+    }
+
+    document.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        els.desiredDose.value = btn.dataset.dose;
+        els.doseUnit.value = 'mg';
+        calculate();
+      });
+    });
+
+    [
+      els.contentPerVial,
+      els.contentUnit,
+      els.diluentMl,
+      els.syringeScale,
+      els.desiredDose,
+      els.doseUnit
+    ].forEach(el => el.addEventListener('input', calculate));
+
+    els.resetBtn.addEventListener('click', () => {
+      els.contentPerVial.value = defaults.contentPerVial;
+      els.diluentMl.value = defaults.diluentMl;
+      els.syringeScale.value = defaults.syringeScale;
+      els.desiredDose.value = defaults.desiredDose;
+      els.doseUnit.value = defaults.doseUnit;
+      els.contentUnit.value = 'mg';
+      calculate();
+    });
+
+    loadState();
+    calculate();
+  </script>
+</body>
+</html>
