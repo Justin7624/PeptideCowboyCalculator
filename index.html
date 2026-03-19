@@ -773,6 +773,7 @@
               <select id="syringeScale">
                 <option value="100" selected>100 units</option>
                 <option value="50">50 units</option>
+                <option value="30">30 units</option>
               </select>
             </div>
 
@@ -1065,8 +1066,15 @@
 
     document.querySelectorAll('.chip').forEach(btn => {
       btn.addEventListener('click', () => {
-        els.desiredDose.value = btn.dataset.dose;
-        els.doseUnit.value = 'mg';
+        const baseMg = parseFloat(btn.dataset.dose);
+    
+        if (els.doseUnit.value === 'mcg') {
+          // convert mg → mcg
+          els.desiredDose.value = baseMg * 1000;
+        } else {
+          els.desiredDose.value = baseMg;
+        }
+    
         calculate();
       });
     });
