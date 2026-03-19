@@ -1027,9 +1027,9 @@
       }
 
       const amountPerMl = contentPerVial / diluentMl;
-      const units = (doseForCalc / amountPerMl) * scale;
-      const fillMl = units * (1 / scale);
-      const amountPerUnit = amountPerMl / scale;
+      const units = (doseForCalc / amountPerMl) * 100; // ALWAYS U-100 standard
+      const fillMl = units * 0.01; // 1 unit = 0.01 mL ALWAYS
+      const amountPerUnit = amountPerMl / 100;
       const safeUnits = Math.max(0, Math.min(units, scale));
       const percent = (safeUnits / scale) * 100;
 
